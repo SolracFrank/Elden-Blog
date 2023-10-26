@@ -3,12 +3,38 @@
 using ApiVersioning.Examples;
 using Asp.Versioning;
 using Microsoft.Extensions.Options;
+using Serilog.Events;
+using Serilog.Sinks.SystemConsole.Themes;
+using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == Environments.Development;
 
 //build configurations
+
+#region Serilog
+
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .MinimumLevel.Information()
+    .WriteTo.Console(
+        LogEventLevel.Debug, builder.Configuration["Logging:OutputTemplate"], theme: SystemConsoleTheme.Colored)
+    .WriteTo.File(Path.Combine(AppContext.BaseDirectory, builder.Configuration["Logging:Dir"]),
+        rollingInterval: RollingInterval.Day, fileSizeLimitBytes: null)
+    .WriteTo.Sentry(configuration =>
+    {
+        configuration.MinimumBreadcrumbLevel = LogEventLevel.Information;
+        configuration.MinimumEventLevel = LogEventLevel.Error;
+    })
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
+if (!isDevelopment)
+    builder.WebHost.UseSentry();
+
+#endregion
 
 #region Controllers
 builder.Services.AddControllers();
