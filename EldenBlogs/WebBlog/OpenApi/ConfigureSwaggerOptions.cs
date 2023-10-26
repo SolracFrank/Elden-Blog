@@ -36,12 +36,12 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
 
     private static OpenApiInfo CreateInfoForApiVersion(ApiVersionDescription description)
     {
-        var text = new StringBuilder("An example application with OpenAPI, Swashbuckle, and API versioning.");
+        var text = new StringBuilder("API documentation ELDEN BLOG");
         var info = new OpenApiInfo()
         {
-            Title = "Example API",
+            Title = "Elden Blog API",
             Version = description.ApiVersion.ToString(),
-            Contact = new OpenApiContact() { Name = "Bill Mei", Email = "bill.mei@somewhere.com" },
+            Contact = new OpenApiContact() { Name = "SolracFrank", Email = "carlosfranciscoherrerafranco@gmail.com" },
             License = new OpenApiLicense() { Name = "MIT", Url = new Uri("https://opensource.org/licenses/MIT") }
         };
 
