@@ -22,17 +22,11 @@ Log.Logger = new LoggerConfiguration()
         LogEventLevel.Debug, builder.Configuration["Logging:OutputTemplate"], theme: SystemConsoleTheme.Colored)
     .WriteTo.File(Path.Combine(AppContext.BaseDirectory, builder.Configuration["Logging:Dir"]),
         rollingInterval: RollingInterval.Day, fileSizeLimitBytes: null)
-    .WriteTo.Sentry(configuration =>
-    {
-        configuration.MinimumBreadcrumbLevel = LogEventLevel.Information;
-        configuration.MinimumEventLevel = LogEventLevel.Error;
-    })
     .CreateLogger();
 
 builder.Host.UseSerilog();
 
-if (!isDevelopment)
-    builder.WebHost.UseSentry();
+
 
 #endregion
 
