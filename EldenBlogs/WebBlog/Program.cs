@@ -8,6 +8,7 @@ using Serilog.Sinks.SystemConsole.Themes;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using WebBlog.Filters;
+using WebApi.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == Environments.Development;
@@ -35,6 +36,7 @@ builder.Host.UseSerilog();
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<GlobalExceptionFilter>();
+    options.Filters.Add<ValidateModelStateFilter>();
 });
 #endregion
 
