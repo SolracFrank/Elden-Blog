@@ -7,6 +7,7 @@ using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using WebBlog.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == Environments.Development;
@@ -31,7 +32,10 @@ builder.Host.UseSerilog();
 #endregion
 
 #region Controllers
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<GlobalExceptionFilter>();
+});
 #endregion
 
 #region Swagger builder
