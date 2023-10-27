@@ -9,6 +9,7 @@ using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using WebBlog.Filters;
 using WebApi.Filters;
+using Application;
 using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,6 +43,13 @@ builder.Services.AddControllers(options =>
        StatusCodes.Status500InternalServerError));
 });
 #endregion
+
+#region Application
+
+builder.Services.AddApplication();
+
+#endregion
+
 
 #region Swagger builder
 builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
