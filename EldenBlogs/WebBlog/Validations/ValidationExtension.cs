@@ -117,7 +117,7 @@ namespace WebApi.Validations
         }
 
         public static ValidationProblemDetails ToProblemDetails(
-         this Domain.Exceptions.ApiExceptions ex)
+         this Domain.Exceptions.ApiException ex)
         {
             var error = new ValidationProblemDetails
             {
