@@ -9,6 +9,7 @@ using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using WebBlog.Filters;
 using WebApi.Filters;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == Environments.Development;
@@ -37,6 +38,8 @@ builder.Services.AddControllers(options =>
 {
     options.Filters.Add<GlobalExceptionFilter>();
     options.Filters.Add<ValidateModelStateFilter>();
+    options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ProblemDetails),
+       StatusCodes.Status500InternalServerError));
 });
 #endregion
 
