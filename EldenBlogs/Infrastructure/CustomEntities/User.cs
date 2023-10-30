@@ -18,6 +18,5 @@ namespace Infrastructure.CustomEntities
             }
         }
         public string? Avatar { get; set; }
-
     }
 }
