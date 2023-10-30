@@ -32,7 +32,7 @@ namespace Infrastructure.Data.Configurations
             builder.HasOne<User>()
                 .WithMany()
                 .HasForeignKey(b => b.Fk_Id_User)
-                .OnDelete(DeleteBehavior.Cascade)
+                .OnDelete(DeleteBehavior.NoAction)
                 .HasConstraintName("fk_comment_user");
 
             builder.HasOne<Entry>()
