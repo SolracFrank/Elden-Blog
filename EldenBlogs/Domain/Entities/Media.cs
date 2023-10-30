@@ -7,6 +7,6 @@
         public required string MediaType { get; set; } 
         public required string MediaPath { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public int Fk_Id_User { get; set; }
+        public string Fk_Id_User { get; set; }
     }
 }
