@@ -7,7 +7,7 @@
         public required string BlogTitle { get; set; }
         public string? BlogDescription { get; set; }
         public required DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime UpdatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         public Guid Fk_Id_User { get; set; }
 
     }
