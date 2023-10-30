@@ -37,7 +37,7 @@ namespace Infrastructure.Data.Configurations
                 .IsRequired();
 
             builder.Property(b => b.UpdatedAt)
-                .IsRequired(false);
+                .IsRequired();
 
             builder.HasOne<User>()
                 .WithMany()

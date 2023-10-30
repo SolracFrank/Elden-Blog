@@ -30,7 +30,7 @@ namespace Infrastructure.Data.Configurations
                 .IsRequired();
 
             builder.Property(e => e.UpdatedAt)
-                .IsRequired(false);
+                .IsRequired();
 
             builder.HasOne<Blog>()
                 .WithMany()
