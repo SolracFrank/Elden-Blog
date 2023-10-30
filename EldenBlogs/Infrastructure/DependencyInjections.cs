@@ -1,7 +1,9 @@
 ﻿using Infrastructure.Data;
+using Infrastructure.CustomEntities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
 
 
 namespace Infrastructure
@@ -18,6 +20,11 @@ namespace Infrastructure
                     builder.EnableRetryOnFailure(4, TimeSpan.FromSeconds(5), null);
                 }));
 
+            #region Add Identity
+            services.AddIdentity<User, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+            #endregion
 
         }
     }
