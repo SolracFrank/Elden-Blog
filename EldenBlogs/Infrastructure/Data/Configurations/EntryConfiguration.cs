@@ -36,7 +36,7 @@ namespace Infrastructure.Data.Configurations
                 .WithMany()
                 .HasForeignKey(b => b.Fk_Id_Blog)
                 .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("fk_blog_user");
+                .HasConstraintName("fk_entry_blog");
 
 
         }
