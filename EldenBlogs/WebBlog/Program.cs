@@ -10,6 +10,7 @@ using WebApi.Filters;
 using Application;
 using Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using WebBlog.Seeder;
 
 var builder = WebApplication.CreateBuilder(args);
 var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == Environments.Development;
@@ -126,6 +127,8 @@ if (app.Environment.IsStaging() || app.Environment.IsDevelopment())
     });
     #endregion
 }
+
+await IdentitySeeder.SeedAsync(app.Services, builder.Configuration);
 
 app.UseHttpsRedirection();
 
