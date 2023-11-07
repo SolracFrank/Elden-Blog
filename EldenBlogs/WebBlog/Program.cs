@@ -1,5 +1,3 @@
-
-
 using ApiVersioning.Examples;
 using Asp.Versioning;
 using Microsoft.Extensions.Options;
@@ -10,6 +8,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using WebBlog.Filters;
 using WebApi.Filters;
 using Application;
+using Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,6 +41,12 @@ builder.Services.AddControllers(options =>
     options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ProblemDetails),
        StatusCodes.Status500InternalServerError));
 });
+#endregion
+
+#region Infrastructure
+
+builder.Services.AddInfrastructure(builder.Configuration);
+
 #endregion
 
 #region Application
