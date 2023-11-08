@@ -14,11 +14,10 @@ namespace Infrastructure.Repositories
         private readonly ILogger<UnitOfWork> _logger;
         private IDbContextTransaction _currentTransaction;
 
-        public UnitOfWork(ApplicationDbContext context, ILogger<UnitOfWork> logger, IDbContextTransaction currentTransaction, IRepository<Blog> blogs, IRepository<BlogSetting> blogSettings, IRepository<Comment> comments, IRepository<Entry> entries, IRepository<Media> medias)
+        public UnitOfWork(ApplicationDbContext context, ILogger<UnitOfWork> logger, IRepository<Blog> blogs, IRepository<BlogSetting> blogSettings, IRepository<Comment> comments, IRepository<Entry> entries, IRepository<Media> medias)
         {
             _context = context;
             _logger = logger;
-            _currentTransaction = currentTransaction;
             Blogs = blogs;
             BlogSettings = blogSettings;
             Comments = comments;
