@@ -1,5 +1,5 @@
 ﻿using Application.Features.Auth.Register;
-using Application.Interfaces;
+using Application.Interfaces.AuthServices;
 using FluentValidation;
 using LanguageExt.Common;
 using MediatR;
@@ -10,9 +10,9 @@ namespace Application.Features.Auth.Handlers
     public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Result<string>>
     {
         private readonly ILogger<RegisterCommandHandler> _logger;
-        private readonly IRegistationService _registationService;
+        private readonly IAuthService _registationService;
 
-        public RegisterCommandHandler(ILogger<RegisterCommandHandler> logger, IRegistationService registationService)
+        public RegisterCommandHandler(ILogger<RegisterCommandHandler> logger, IAuthService registationService)
         {
             _logger = logger;
             _registationService = registationService;

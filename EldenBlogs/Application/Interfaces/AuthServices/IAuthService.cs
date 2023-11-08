@@ -1,8 +1,8 @@
 ﻿using Application.Features.Auth.Register;
 
-namespace Application.Interfaces
+namespace Application.Interfaces.AuthServices
 {
-    public interface IRegistationService
+    public interface IAuthService
     {
         public Task<string> RegisterAsync(RegisterCommand registerRequest, CancellationToken cancellationToken);
 

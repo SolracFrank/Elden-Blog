@@ -28,6 +28,16 @@ namespace WebBlog.Controllers.V1
 
             return result.ToOk();
         }
+        [HttpPost("signin")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Login succesful")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid inputs", typeof(ValidationProblemDetails))]
+
+        public async Task<IActionResult> AuthLogin(CancellationToken cancellationToken)
+        {
+
+
+            return Ok();
+        }
 
     }
 }

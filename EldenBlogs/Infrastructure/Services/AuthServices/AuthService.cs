@@ -1,6 +1,6 @@
 ﻿using Application.enums;
 using Application.Features.Auth.Register;
-using Application.Interfaces;
+using Application.Interfaces.AuthServices;
 using Domain.Exceptions;
 using Domain.Interfaces;
 using Infrastructure.CustomEntities;
@@ -13,14 +13,14 @@ using System.Security.Claims;
 
 namespace Infrastructure.Services.AuthServices
 {
-    internal class RegistationService : IRegistationService
+    internal class AuthService : IAuthService
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly ILogger<RegistationService> _logger;
+        private readonly ILogger<AuthService> _logger;
         private readonly IUnitOfWork _unitOfWork;
 
-        public RegistationService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, ILogger<RegistationService> logger, IUnitOfWork unitOfWork)
+        public AuthService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, ILogger<AuthService> logger, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _roleManager = roleManager;
