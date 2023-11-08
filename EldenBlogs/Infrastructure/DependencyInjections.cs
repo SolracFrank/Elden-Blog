@@ -6,6 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Domain.Interfaces;
 using Infrastructure.Repositories;
+using Application.Interfaces;
+using Infrastructure.Services.AuthServices;
 
 namespace Infrastructure
 {
@@ -38,7 +40,8 @@ namespace Infrastructure
             #region ScoopedService
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped<IUnitOfWork,UnitOfWork>();
-
+            services.AddScoped<IRegistationService, RegistationService>();
+            
             #endregion
         }
     }
