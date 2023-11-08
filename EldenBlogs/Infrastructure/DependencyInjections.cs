@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using Domain.Interfaces;
+using Infrastructure.Repositories;
 
 namespace Infrastructure
 {
@@ -34,6 +35,11 @@ namespace Infrastructure
             });
             #endregion
 
+            #region ScoopedService
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped<IUnitOfWork,UnitOfWork>();
+
+            #endregion
         }
     }
 }
