@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
-namespace WebApi.Validations
+namespace WebBlog.Validations
 {
     public static class ValidationExtension
     {
