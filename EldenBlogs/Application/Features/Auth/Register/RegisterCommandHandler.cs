@@ -30,8 +30,6 @@ namespace Application.Features.Auth.Handlers
 
                 return new Result<string>(new ValidationException(validationResult.Errors));
             }
-
-
             #endregion
            
 
