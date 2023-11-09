@@ -1,5 +1,6 @@
 ﻿using Application.Features.Auth.Login;
 using Application.Features.Auth.Register;
+using Application.Interfaces.AppServices.ConnectionServices;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -9,13 +10,20 @@ namespace WebBlog.Controllers.V1
     [ApiController]
     public class AuthController : BaseApiController
     {
+        private readonly IIpManagerService _ipManager;
+
+        public AuthController(IIpManagerService ipManager)
+        {
+            _ipManager = ipManager;
+        }
+
         [HttpPost("register")]
         [SwaggerResponse(StatusCodes.Status200OK, "Register succesful")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid inputs", typeof(ValidationProblemDetails))]
 
         public async Task<IActionResult> AuthRegister([FromBody] RegisterCommand request, CancellationToken cancellationToken)
         {
-            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            var ipAddress = _ipManager.GenerateIpAddress();
 
             var result = await Mediator.Send(new RegisterCommand
             {
@@ -35,8 +43,8 @@ namespace WebBlog.Controllers.V1
 
         public async Task<IActionResult> AuthLogin([FromBody] LoginCommand request, CancellationToken cancellationToken)
         {
-            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
-
+            var ipAddress = _ipManager.GenerateIpAddress();
+                
             var result = await Mediator.Send(new LoginCommand
             {
                 Email = request.Email,
