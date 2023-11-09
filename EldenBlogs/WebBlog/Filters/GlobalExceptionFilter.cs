@@ -34,8 +34,8 @@ namespace WebBlog.Filters
                 var exception = (InfrastructureException)context.Exception;
                 statusCode = StatusCodes.Status500InternalServerError;
 
-                problemDetails.Title = "Houston, we have a problem.";
-                problemDetails.Detail = "Existe un problema en la infraestructura.";
+                problemDetails.Detail = exception.Message;
+                problemDetails.Title = "Application infrastructure has failed";
             }
             if (isValidationException)
             {
