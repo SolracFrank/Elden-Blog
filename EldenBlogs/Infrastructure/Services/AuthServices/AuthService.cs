@@ -1,13 +1,16 @@
 ﻿using Application.enums;
 using Application.Features.Auth.Login;
+using Application.Features.Auth.RefreshSession;
 using Application.Features.Auth.Register;
 using Application.Interfaces.AuthServices;
 using Application.Interfaces.TokenServices;
+using Azure;
 using Domain.Dtos.Token;
 using Domain.Exceptions;
 using Domain.Interfaces;
 using Infrastructure.CustomEntities;
 using Infrastructure.Utils;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using System.IdentityModel.Tokens.Jwt;
@@ -23,8 +26,11 @@ namespace Infrastructure.Services.AuthServices
         private readonly ILogger<AuthService> _logger;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IGenerateJWTService<User> _generateJWTService;
+        private readonly IValidateRefreshTokenService _validateRefreshTokenService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IValidateUserService<User> _validateUserService;
 
-        public AuthService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, ILogger<AuthService> logger, IUnitOfWork unitOfWork, SignInManager<User> signInManager, IGenerateJWTService<User> generateJWTService)
+        public AuthService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, ILogger<AuthService> logger, IUnitOfWork unitOfWork, SignInManager<User> signInManager, IGenerateJWTService<User> generateJWTService, IHttpContextAccessor httpContextAccessor, IValidateRefreshTokenService validateRefreshTokenService, IValidateUserService<User> validateUserService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -32,6 +38,9 @@ namespace Infrastructure.Services.AuthServices
             _unitOfWork = unitOfWork;
             _signInManager = signInManager;
             _generateJWTService = generateJWTService;
+            _httpContextAccessor = httpContextAccessor;
+            _validateRefreshTokenService = validateRefreshTokenService;
+            _validateUserService = validateUserService;
         }
 
         public async Task<string> RegisterAsync(RegisterCommand registerRequest, CancellationToken cancellationToken)
@@ -96,14 +105,11 @@ namespace Infrastructure.Services.AuthServices
         {
             _logger.LogInformation("Searching user...");
             var user = await _userManager.FindByEmailAsync(loginRequest.Email);
-            
-            if (user == null )
-            {
-                _logger.LogInformation("User not found");
-                throw new BadRequestException("Wrong credentials");
-            }
+
+            user.EnsureExists(_logger, "User not found", "Wrong credentials");
 
             _logger.LogInformation("Validating Password");
+
             var result = await _signInManager.PasswordSignInAsync(user, loginRequest.Password, true, true);
             if (!result.Succeeded)
             {
@@ -111,30 +117,7 @@ namespace Infrastructure.Services.AuthServices
                 throw new BadRequestException("Wrong credentials");
             }
 
-            _logger.LogInformation("Getting user roles...");
-            var userRoles = await _userManager.GetRolesAsync(user);
-
-            if (!userRoles.Any())
-            {
-                _logger.LogInformation("Not roles founded");
-                _logger.LogInformation("Adding new roles");
-                var roleResult = await _userManager.AddToRoleAsync(user, Roles.Poster.ToString());
-                if (!roleResult.Succeeded)
-                {
-                    _logger.LogInformation($"An error has ocurred while validating roles for {user.UserName}");
-                    throw new ApiException("An error has ocurred while validating user");
-                }
-            }
-            _logger.LogInformation("Roles OK");
-
-            var userClaims = await _userManager.GetClaimsAsync(user);
-            
-            foreach(var rol in userRoles)
-            {
-                userClaims.Add(new Claim(rol.ToString(),"true"));
-            }
-
-            var claimIdentity = new ClaimsIdentity(userClaims, "DefaultLogin");
+            var claimIdentity = await _validateUserService.ValidateUserClaims(user);
 
             _logger.LogInformation("Creating JWT Token...");
             JWTResult jwtResult = _generateJWTService.GenerateJWTToken(user, claimIdentity);
@@ -159,12 +142,51 @@ namespace Infrastructure.Services.AuthServices
                 throw new ApiException("Error on login, try again");
             }
 
-            jwtResult.RefreshToken = refreshToken.Token;
-            jwtResult.RefreshTokenExpires = refreshToken.Expires;
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = false,//TRUE ON PRODUCTION
+                Expires = refreshToken.Expires,
+                SameSite = SameSiteMode.Strict,
+                Secure = true 
+            };
+
+            _httpContextAccessor.HttpContext.Response.Cookies.Append("refreshToken", refreshToken.Token, cookieOptions);
 
             return jwtResult;
         }
 
-        //TODO AÑADIR LAS INYECCIONES DE DEPENDENCIAS Y PROBAR EL CÓDIGO
+        public async Task<JWTResult> RefreshSessionToken(RefreshSessionCommand refreshRequest, CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("Validating user...");
+
+            var user = await _userManager.FindByIdAsync(refreshRequest.UserId);
+            user.EnsureExists(_logger, "User not found", "There's a problem with the session");
+            
+            var newRefreshToken = await _validateRefreshTokenService.ValidateRefreshToken(refreshRequest.RefreshToken, refreshRequest.UserId, refreshRequest.IpAddress, cancellationToken);
+
+            if(newRefreshToken == null)
+            {
+                throw new ValidationException("Error on genereting new refresh token");
+            }
+
+            var claimIdentity = await _validateUserService.ValidateUserClaims(user);
+
+            _logger.LogInformation("Creating JWT Token...");
+            JWTResult jwtResult = _generateJWTService.GenerateJWTToken(user, claimIdentity);
+            _logger.LogInformation("JWT Token created.");
+
+
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = false,//TRUE ON PRODUCTION
+                Expires = newRefreshToken.Expires,
+                SameSite = SameSiteMode.Strict,
+                Secure = true
+            };
+
+            _httpContextAccessor.HttpContext.Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
+
+            return jwtResult;
+        }
     }
 }
