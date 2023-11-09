@@ -1,10 +1,12 @@
 ﻿using Application.enums;
+using Application.Features.Auth.Login;
 using Application.Features.Auth.Register;
 using Application.Interfaces.AuthServices;
+using Application.Interfaces.TokenServices;
+using Domain.Dtos.Token;
 using Domain.Exceptions;
 using Domain.Interfaces;
 using Infrastructure.CustomEntities;
-using Infrastructure.Repositories;
 using Infrastructure.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -17,15 +19,19 @@ namespace Infrastructure.Services.AuthServices
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly SignInManager<User> _signInManager;
         private readonly ILogger<AuthService> _logger;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IGenerateJWTService<User> _generateJWTService;
 
-        public AuthService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, ILogger<AuthService> logger, IUnitOfWork unitOfWork)
+        public AuthService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, ILogger<AuthService> logger, IUnitOfWork unitOfWork, SignInManager<User> signInManager, IGenerateJWTService<User> generateJWTService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _logger = logger;
             _unitOfWork = unitOfWork;
+            _signInManager = signInManager;
+            _generateJWTService = generateJWTService;
         }
 
         public async Task<string> RegisterAsync(RegisterCommand registerRequest, CancellationToken cancellationToken)
@@ -64,12 +70,12 @@ namespace Infrastructure.Services.AuthServices
                     await _userManager.AddToRoleAsync(user, Roles.Poster.ToString());
 
                     var userClaims = new List<Claim>
-                {
-                   new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-                   new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                   new Claim("ip", registerRequest.IpAddress),
-                   new Claim("Active","True")
-                };
+                    {
+                       new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+                       new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                       new Claim("ip", registerRequest.IpAddress),
+                       new Claim("Active","True"),
+                    };
 
                     await _userManager.AddClaimsAsync(user, userClaims);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -86,5 +92,79 @@ namespace Infrastructure.Services.AuthServices
             });
         }
 
+        public async Task<JWTResult> LoginAsync(LoginCommand loginRequest, CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("Searching user...");
+            var user = await _userManager.FindByEmailAsync(loginRequest.Email);
+            
+            if (user == null )
+            {
+                _logger.LogInformation("User not found");
+                throw new BadRequestException("Wrong credentials");
+            }
+
+            _logger.LogInformation("Validating Password");
+            var result = await _signInManager.PasswordSignInAsync(user, loginRequest.Password, true, true);
+            if (!result.Succeeded)
+            {
+                _logger.LogInformation("Wrong password");
+                throw new BadRequestException("Wrong credentials");
+            }
+
+            _logger.LogInformation("Getting user roles...");
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            if (!userRoles.Any())
+            {
+                _logger.LogInformation("Not roles founded");
+                _logger.LogInformation("Adding new roles");
+                var roleResult = await _userManager.AddToRoleAsync(user, Roles.Poster.ToString());
+                if (!roleResult.Succeeded)
+                {
+                    _logger.LogInformation($"An error has ocurred while validating roles for {user.UserName}");
+                    throw new ApiException("An error has ocurred while validating user");
+                }
+            }
+            _logger.LogInformation("Roles OK");
+
+            var userClaims = await _userManager.GetClaimsAsync(user);
+            
+            foreach(var rol in userRoles)
+            {
+                userClaims.Add(new Claim(rol.ToString(),"true"));
+            }
+
+            var claimIdentity = new ClaimsIdentity(userClaims, "DefaultLogin");
+
+            _logger.LogInformation("Creating JWT Token...");
+            JWTResult jwtResult = _generateJWTService.GenerateJWTToken(user, claimIdentity);
+            _logger.LogInformation("JWT Token created.");
+
+            var refreshToken = new RefreshToken
+            {
+                Id = new Guid(),
+                UserId = user.Id,
+                CreatedByIp = loginRequest.Ip,
+                Expires = DateTime.UtcNow.AddDays(30),
+                Token = RefreshTokenGenerator.RandomTokenString(),
+            };
+            _logger.LogInformation("Creating refreshToken.");
+
+            await _unitOfWork.RefreshTokens.AddAsync(refreshToken, cancellationToken);
+            _logger.LogInformation("Saving RefreshToken in Database...");
+            var refreshTokenResult = await _unitOfWork.SaveChangesAsync(cancellationToken);
+            if(!refreshTokenResult)
+            {
+                _logger.LogInformation("Failed to save RefreshToken");
+                throw new ApiException("Error on login, try again");
+            }
+
+            jwtResult.RefreshToken = refreshToken.Token;
+            jwtResult.RefreshTokenExpires = refreshToken.Expires;
+
+            return jwtResult;
+        }
+
+        //TODO AÑADIR LAS INYECCIONES DE DEPENDENCIAS Y PROBAR EL CÓDIGO
     }
 }
