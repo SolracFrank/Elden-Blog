@@ -1,4 +1,4 @@
-﻿using Application.Interfaces.AuthServices;
+using Application.Interfaces.AuthServices;
 using Domain.Dtos.Token;
 using LanguageExt.Common;
 using MediatR;
