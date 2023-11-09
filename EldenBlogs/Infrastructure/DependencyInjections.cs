@@ -53,13 +53,14 @@ namespace Infrastructure
             services.AddScoped<IUnitOfWork,UnitOfWork>();
             services.AddScoped(typeof(IGenerateJWTService<>), typeof(GenerateJWTService<>));
             services.AddTransient<IIpManagerService,IpManagerService>();
+            services.AddTransient<IValidateRefreshTokenService,ValidateRefreshTokenService>();
             services.AddScoped<IAuthService, AuthService>();
             #endregion
 
 
             services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));
 
-            #region Authentication
+            #region Auth Token Configuration
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
