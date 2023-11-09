@@ -8,6 +8,9 @@ using Domain.Interfaces;
 using Infrastructure.Repositories;
 using Infrastructure.Services.AuthServices;
 using Application.Interfaces.AuthServices;
+using Application.Interfaces.TokenServices;
+using Infrastructure.Services.TokenServices;
+using Domain.Dtos.Token;
 
 namespace Infrastructure
 {
@@ -40,8 +43,16 @@ namespace Infrastructure
             #region ScoopedService
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped<IUnitOfWork,UnitOfWork>();
+            services.AddScoped(typeof(IGenerateJWTService<>), typeof(GenerateJWTService<>));
             services.AddScoped<IAuthService, AuthService>();
-            
+
+            #endregion
+            services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));
+            #region Authentication
+            #endregion
+
+            #region Authorization
+
             #endregion
         }
     }
