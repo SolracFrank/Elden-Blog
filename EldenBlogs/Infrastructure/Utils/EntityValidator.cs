@@ -14,6 +14,15 @@ namespace Infrastructure.Utils
                 throw new BadRequestException($"{entityName} already exists");
             }
         }
+        public static void EnsureExists<T>(this T entity, ILogger logger, string? logInformation = null, string? exceptionInformation = null) where T : class
+        {
+            if (entity == null)
+            {
+                var entityName = typeof(T).Name;
+                logger.LogInformation(logInformation?? $"{entityName} does not exist");
+                throw new BadRequestException(exceptionInformation ?? $"{entityName} does not exists");
+            }
+        }
 
     }
 }
