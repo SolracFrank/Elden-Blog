@@ -144,7 +144,7 @@ namespace Infrastructure.Services.AuthServices
 
             var cookieOptions = new CookieOptions
             {
-                HttpOnly = false,//TRUE ON PRODUCTION
+                HttpOnly = true,
                 Expires = refreshToken.Expires,
                 SameSite = SameSiteMode.Strict,
                 Secure = true 
@@ -178,10 +178,11 @@ namespace Infrastructure.Services.AuthServices
 
             var cookieOptions = new CookieOptions
             {
-                HttpOnly = false,//TRUE ON PRODUCTION
+                HttpOnly = true,
                 Expires = newRefreshToken.Expires,
                 SameSite = SameSiteMode.Strict,
-                Secure = true
+                Secure = true,
+                
             };
 
             _httpContextAccessor.HttpContext.Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);

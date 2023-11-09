@@ -70,7 +70,7 @@ namespace Infrastructure
             })
             .AddJwtBearer("EldenJWT", jwtOption => {
                 jwtOption.RequireHttpsMetadata = false;
-                jwtOption.SaveToken = true;
+                jwtOption.SaveToken = false;
                 jwtOption.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,

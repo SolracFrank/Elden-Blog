@@ -24,17 +24,28 @@ namespace Application.Interfaces.TokenServices
             if (tokenToValidate.IsNull() || tokenToValidate == "")
             {
                 _logger.LogInformation("Token is null");
-                throw new ValidationException("There's a problem with the session");
+                throw new ValidationException("Session token doesn't exist");
             }
             _logger.LogInformation("Getting stored RefreshToken.");
             var refreshToken = await _unitOfWork.RefreshTokens.FirstOrDefaultAsync(t => t.Token == tokenToValidate && t.UserId == userId
-            && t.Expires > DateTime.UtcNow && t.Revoked == null, cancellationToken);
+          , cancellationToken);
+
             if (refreshToken == null)
             {
                 _logger.LogInformation("StoredToken is invalid.");
                 throw new ValidationException("Session doesn't exist");
             }
-            
+            if(refreshToken.IsExpired)
+            {
+                _logger.LogInformation("StoredToken is expired.");
+                throw new ValidationException("Session expired");
+            }
+            if (refreshToken.Revoked != null)
+            {
+                _logger.LogInformation("StoredToken is revoked.");
+                throw new ValidationException("Session revoked");
+            }
+
 
             var newRefreshToken = new RefreshToken
             {
