@@ -7,7 +7,5 @@
         public string Email { get; set; }
         public string JWToken { get; set; }
         public DateTime JWTExpires { get; set; }
-        public string RefreshToken { get; set; }
-        public DateTime RefreshTokenExpires { get; set; }
     }
 }
