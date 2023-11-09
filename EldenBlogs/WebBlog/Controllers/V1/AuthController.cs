@@ -1,6 +1,8 @@
 ﻿using Application.Features.Auth.Login;
+using Application.Features.Auth.RefreshSession;
 using Application.Features.Auth.Register;
 using Application.Interfaces.AppServices.ConnectionServices;
+using Domain.Dtos.Token;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -55,5 +57,22 @@ namespace WebBlog.Controllers.V1
             return result.ToOk();
         }
 
+        [HttpPost("refresh-token")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Login succesful")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid inputs", typeof(ValidationProblemDetails))]
+        public async Task<IActionResult> RefreshSessionToken([FromBody] RefreshTokenRequest request, CancellationToken cancellationToken)
+        {
+            var ipAddress = _ipManager.GenerateIpAddress();
+            var refreshToken = HttpContext.Request.Cookies["refreshToken"];
+
+            var result = await Mediator.Send(new RefreshSessionCommand
+            {
+                UserId = request.UserId,
+                IpAddress = ipAddress,
+                RefreshToken = refreshToken,
+            }, cancellationToken);
+
+            return result.ToOk();
+        }
     }
 }
