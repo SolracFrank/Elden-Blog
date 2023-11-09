@@ -12,6 +12,7 @@ using Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using WebBlog.Seeder;
 using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == Environments.Development;
@@ -143,6 +144,8 @@ builder.Services.AddApiVersioning(
 #region ProblemDetails
 builder.Services.AddProblemDetails();
 #endregion
+
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 

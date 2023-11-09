@@ -18,6 +18,7 @@ using Azure;
 using Domain.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using Application.Interfaces.AppServices.ConnectionServices;
 
 namespace Infrastructure
 {
@@ -47,13 +48,15 @@ namespace Infrastructure
             });
             #endregion
 
-            #region ScoopedService
+            #region Services
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped<IUnitOfWork,UnitOfWork>();
             services.AddScoped(typeof(IGenerateJWTService<>), typeof(GenerateJWTService<>));
+            services.AddTransient<IIpManagerService,IpManagerService>();
             services.AddScoped<IAuthService, AuthService>();
-
             #endregion
+
+
             services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));
 
             #region Authentication
