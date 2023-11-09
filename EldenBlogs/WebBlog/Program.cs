@@ -11,6 +11,7 @@ using Application;
 using Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using WebBlog.Seeder;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == Environments.Development;
@@ -29,9 +30,6 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
-
-
-
 #endregion
 
 #region Controllers
@@ -56,13 +54,55 @@ builder.Services.AddApplication();
 
 #endregion
 
+#region Auth
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Unconfirmed", policy =>
+    {
+        policy.RequireClaim("Poster", "true");
+    });
+    options.AddPolicy("PosterPolicy", policy =>
+    {
+        policy.RequireClaim("Active", "True")
+        .RequireClaim("Poster", "true");
+    });
+    options.AddPolicy("AdminPolicy", policy =>
+    {
+        policy.RequireClaim("AdminUser", "true")
+        .RequireClaim("Master", "true");
+    });
+});
+#endregion
 
 #region Swagger builder
 builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 builder.Services.AddSwaggerGen(
     options =>
     {
-        // add a custom operation filter which sets default values
+        var securitySchema = new OpenApiSecurityScheme
+        {
+            Description =
+            "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+            Name = "Authorization",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            Reference = new OpenApiReference
+            {
+                Type = ReferenceType.SecurityScheme,
+                Id = "Bearer"
+            }
+        };
+
+        options.AddSecurityDefinition("Bearer", securitySchema);
+
+        var securityRequirement = new OpenApiSecurityRequirement
+        {
+             { securitySchema, new[] { "Bearer" } }
+        };
+        options.AddSecurityRequirement(securityRequirement);
+
+
         options.OperationFilter<SwaggerDefaultValues>();
 
         var fileName = typeof(Program).Assembly.GetName().Name + ".xml";
