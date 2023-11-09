@@ -54,6 +54,7 @@ namespace Infrastructure
             services.AddScoped(typeof(IGenerateJWTService<>), typeof(GenerateJWTService<>));
             services.AddTransient<IIpManagerService,IpManagerService>();
             services.AddTransient<IValidateRefreshTokenService,ValidateRefreshTokenService>();
+            services.AddTransient(typeof(IValidateUserService<>), typeof(ValidateUserService<>));
             services.AddScoped<IAuthService, AuthService>();
             #endregion
 
