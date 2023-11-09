@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Domain.Dtos.Token;
+using Domain.Entities;
 using Domain.Exceptions;
 using Domain.Interfaces;
 using Infrastructure.Data;
@@ -14,7 +15,7 @@ namespace Infrastructure.Repositories
         private readonly ILogger<UnitOfWork> _logger;
         private IDbContextTransaction _currentTransaction;
 
-        public UnitOfWork(ApplicationDbContext context, ILogger<UnitOfWork> logger, IRepository<Blog> blogs, IRepository<BlogSetting> blogSettings, IRepository<Comment> comments, IRepository<Entry> entries, IRepository<Media> medias)
+        public UnitOfWork(ApplicationDbContext context, ILogger<UnitOfWork> logger, IRepository<Blog> blogs, IRepository<BlogSetting> blogSettings, IRepository<Comment> comments, IRepository<Entry> entries, IRepository<Media> medias, IRepository<RefreshToken> refreshTokens)
         {
             _context = context;
             _logger = logger;
@@ -23,6 +24,7 @@ namespace Infrastructure.Repositories
             Comments = comments;
             Entries = entries;
             Medias = medias;
+            RefreshTokens = refreshTokens;
         }
 
         public IRepository<Blog> Blogs { get; }
@@ -30,6 +32,8 @@ namespace Infrastructure.Repositories
         public IRepository<Comment> Comments { get; }
         public IRepository<Entry> Entries { get; }
         public IRepository<Media> Medias { get; }
+        public IRepository<RefreshToken> RefreshTokens { get; }
+
 
         public void Dispose()
         {

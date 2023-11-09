@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Domain.Dtos.Token;
+using Domain.Entities;
 
 namespace Domain.Interfaces
 {
@@ -9,6 +10,7 @@ namespace Domain.Interfaces
         IRepository<Comment> Comments { get; }
         IRepository<Entry> Entries { get; }
         IRepository<Media> Medias { get; }
+        IRepository<RefreshToken> RefreshTokens { get; }
         bool SaveChanges();
         Task<bool> SaveChangesAsync(CancellationToken cancellationToken);
         public Task BeginTransactionAsync();
