@@ -1,4 +1,5 @@
-﻿using Application.Features.Auth.Register;
+﻿using Application.Features.Auth.Login;
+using Application.Features.Auth.Register;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -32,11 +33,18 @@ namespace WebBlog.Controllers.V1
         [SwaggerResponse(StatusCodes.Status200OK, "Login succesful")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid inputs", typeof(ValidationProblemDetails))]
 
-        public async Task<IActionResult> AuthLogin(CancellationToken cancellationToken)
+        public async Task<IActionResult> AuthLogin([FromBody] LoginCommand request, CancellationToken cancellationToken)
         {
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
 
+            var result = await Mediator.Send(new LoginCommand
+            {
+                Email = request.Email,
+                Password = request.Password,
+                Ip = ipAddress,
+            },cancellationToken);
 
-            return Ok();
+            return result.ToOk();
         }
 
     }
