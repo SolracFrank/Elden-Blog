@@ -1,18 +1,17 @@
 using ApiVersioning.Examples;
-using Asp.Versioning;
-using Microsoft.Extensions.Options;
-using Serilog.Events;
-using Serilog.Sinks.SystemConsole.Themes;
-using Serilog;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using WebBlog.Filters;
-using WebApi.Filters;
 using Application;
+using Asp.Versioning;
 using Infrastructure;
 using Microsoft.AspNetCore.Mvc;
-using WebBlog.Seeder;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
-using Microsoft.Extensions.DependencyInjection;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.SystemConsole.Themes;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using WebApi.Filters;
+using WebBlog.Filters;
+using WebBlog.Seeder;
 
 var builder = WebApplication.CreateBuilder(args);
 var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == Environments.Development;

@@ -2,13 +2,15 @@
 using Application.Features.Auth.RefreshSession;
 using Application.Features.Auth.Register;
 using Application.Interfaces.AppServices.ConnectionServices;
+using Asp.Versioning;
 using Domain.Dtos.Token;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace WebBlog.Controllers.V1
 {
-    [Route("api/[controller]")]
+    [ApiVersion(1.0)]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
     public class AuthController : BaseApiController
     {
