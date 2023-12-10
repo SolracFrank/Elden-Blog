@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Domain.Exceptions;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Interfaces.AppServices.ConnectionServices
 {
@@ -17,7 +18,7 @@ namespace Application.Interfaces.AppServices.ConnectionServices
 
             if (httpContext == null)
             {
-                return "IP Unavailable";
+                throw new ApiException ("IP Unavailable");
             }
 
             if (httpContext.Request.Headers.ContainsKey("X-Forwarded-For"))
@@ -28,8 +29,7 @@ namespace Application.Interfaces.AppServices.ConnectionServices
             {
                 return httpContext.Connection.RemoteIpAddress.ToString();
             }
-
-            return "IP Unavailable";
+            throw new ApiException("IP Unavailable");
         }
     }
 }
