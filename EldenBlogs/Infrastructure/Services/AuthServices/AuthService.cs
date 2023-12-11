@@ -82,7 +82,6 @@ namespace Infrastructure.Services.AuthServices
                     {
                        new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
                        new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                       new Claim("ip", registerRequest.IpAddress),
                        new Claim("Active","True"),
                     };
 

@@ -87,7 +87,7 @@ namespace Infrastructure
                 {
                     OnAuthenticationFailed = context =>
                     {
-                        context.Response.StatusCode = 500;
+                        context.Response.StatusCode = 401;
                         context.Response.ContentType = "text/plain";
                         if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
                         {
