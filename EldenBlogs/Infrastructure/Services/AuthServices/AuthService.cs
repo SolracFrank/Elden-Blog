@@ -140,7 +140,7 @@ namespace Infrastructure.Services.AuthServices
                 _logger.LogInformation("Failed to save RefreshToken");
                 throw new ApiException("Error on login, try again");
             }
-            jwtResult.SessionDuration = jwtResult.SessionDuration;
+            jwtResult.SessionDuration = refreshToken.Expires;
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
