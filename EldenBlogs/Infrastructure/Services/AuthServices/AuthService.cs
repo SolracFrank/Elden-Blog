@@ -140,7 +140,7 @@ namespace Infrastructure.Services.AuthServices
                 _logger.LogInformation("Failed to save RefreshToken");
                 throw new ApiException("Error on login, try again");
             }
-
+            jwtResult.SessionDuration = jwtResult.SessionDuration;
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
@@ -172,6 +172,7 @@ namespace Infrastructure.Services.AuthServices
 
             _logger.LogInformation("Creating JWT Token...");
             JWTResult jwtResult = _generateJWTService.GenerateJWTToken(user, claimIdentity);
+            jwtResult.SessionDuration = newRefreshToken.Expires;
             _logger.LogInformation("JWT Token created.");
 
 
