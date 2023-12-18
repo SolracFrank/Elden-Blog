@@ -49,8 +49,12 @@ namespace Infrastructure.Services.AuthServices
 
             user.EnsureDoesNotExist(_logger);
 
-            if (!await _roleManager.RoleExistsAsync(Roles.Poster.ToString()))
+            _logger.LogInformation("Validating existing roles");
+            var roleExists = await _roleManager.RoleExistsAsync(Roles.Poster.ToString());
+            _logger.LogInformation($"Role {Roles.Poster.ToString()} exist: {roleExists}");
+            if (!roleExists)
             {
+
                 await _roleManager.CreateAsync(new IdentityRole(Roles.Poster.ToString()));
             }
 

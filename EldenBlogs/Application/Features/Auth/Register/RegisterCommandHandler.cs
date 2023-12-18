@@ -26,7 +26,7 @@ namespace Application.Features.Auth.Handlers
             #region Validation Behavior
             if (!validationResult.IsValid)
             {
-                _logger.LogInformation("Validation errors with Todo");
+                _logger.LogInformation("Validation errors");
 
                 return new Result<string>(new ValidationException(validationResult.Errors));
             }
