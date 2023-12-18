@@ -146,6 +146,21 @@ builder.Services.AddProblemDetails();
 
 builder.Services.AddHttpContextAccessor();
 
+#region CORS BUILDER
+if (isDevelopment)
+{
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowAll", policyBuilder =>
+        {
+            policyBuilder.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+    });
+}
+#endregion
+
 var app = builder.Build();
 
 //app configurations
@@ -168,6 +183,9 @@ if (app.Environment.IsStaging() || app.Environment.IsDevelopment())
         }
     });
     #endregion
+
+    app.UseCors("AllowAll");
+
 }
 
 await IdentitySeeder.SeedAsync(app.Services, builder.Configuration);
