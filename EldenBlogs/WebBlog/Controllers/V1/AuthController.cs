@@ -3,6 +3,7 @@ using Application.Features.Auth.RefreshSession;
 using Application.Features.Auth.Register;
 using Application.Interfaces.AppServices.ConnectionServices;
 using Asp.Versioning;
+using Domain.Dtos.Auth;
 using Domain.Dtos.Token;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -45,7 +46,7 @@ namespace WebBlog.Controllers.V1
         [SwaggerResponse(StatusCodes.Status200OK, "Login succesful")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid inputs", typeof(ValidationProblemDetails))]
 
-        public async Task<IActionResult> AuthLogin([FromBody] LoginCommand request, CancellationToken cancellationToken)
+        public async Task<IActionResult> AuthLogin([FromBody] LoginDto request, CancellationToken cancellationToken)
         {
             var ipAddress = _ipManager.GenerateIpAddress();
                 
