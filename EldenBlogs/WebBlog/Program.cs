@@ -151,11 +151,12 @@ if (isDevelopment)
 {
     builder.Services.AddCors(options =>
     {
-        options.AddPolicy("AllowAll", policyBuilder =>
+        options.AddPolicy("AllowLocalHost", policyBuilder =>
         {
-            policyBuilder.AllowAnyOrigin()
+            policyBuilder.WithOrigins("https://localhost:5173")
                 .AllowAnyMethod()
-                .AllowAnyHeader();
+                .AllowAnyHeader()
+                .AllowCredentials();
         });
     });
 }
@@ -184,7 +185,7 @@ if (app.Environment.IsStaging() || app.Environment.IsDevelopment())
     });
     #endregion
 
-    app.UseCors("AllowAll");
+    app.UseCors("AllowLocalHost");
 
 }
 
