@@ -23,7 +23,7 @@ namespace Application.Features.Auth.Login
             #region Validation Behavior
             if (!validationResult.IsValid)
             {
-                _logger.LogInformation("Validation errors with Todo");
+                _logger.LogInformation("Validation errors");
 
                 return new Result<JWTResult>(new FluentValidation.ValidationException(validationResult.Errors));
             }
