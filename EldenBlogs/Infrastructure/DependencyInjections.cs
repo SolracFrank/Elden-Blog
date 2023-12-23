@@ -56,6 +56,8 @@ namespace Infrastructure
             services.AddTransient<IValidateRefreshTokenService,ValidateRefreshTokenService>();
             services.AddTransient(typeof(IValidateUserService<>), typeof(ValidateUserService<>));
             services.AddScoped<IAuthService, AuthService>();
+
+            services.AddScoped<IValidateSessionService, ValidateSessionService>();
             #endregion
 
 
