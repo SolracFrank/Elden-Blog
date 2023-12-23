@@ -1,6 +1,7 @@
 ﻿using Application.Features.Auth.Login;
 using Application.Features.Auth.RefreshSession;
 using Application.Features.Auth.Register;
+using Application.Features.Auth.ValidateSession;
 using Application.Interfaces.AppServices.ConnectionServices;
 using Asp.Versioning;
 using Domain.Dtos.Auth;
@@ -61,9 +62,9 @@ namespace WebBlog.Controllers.V1
         }
 
         [HttpPost("refresh-token")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Login succesful")]
+        [SwaggerResponse(StatusCodes.Status200OK, "refreshing succesful")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid inputs", typeof(ValidationProblemDetails))]
-        public async Task<IActionResult> RefreshSessionToken([FromBody] RefreshTokenRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> RefreshSessionToken([FromBody] RefreshSessionDto request, CancellationToken cancellationToken)
         {
             var ipAddress = _ipManager.GenerateIpAddress();
             var refreshToken = HttpContext.Request.Cookies["refreshToken"];
@@ -72,6 +73,22 @@ namespace WebBlog.Controllers.V1
             {
                 UserId = request.UserId,
                 IpAddress = ipAddress,
+                RefreshToken = refreshToken,
+            }, cancellationToken);
+
+            return result.ToOk();
+        }
+
+        [HttpPost("validate-session")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Session Validated")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid inputs", typeof(ValidationProblemDetails))]
+        public async Task<IActionResult> ValidateSession([FromBody] SessionValidationRequest request, CancellationToken cancellationToken)
+        {
+            var refreshToken = HttpContext.Request.Cookies["refreshToken"];
+
+            var result = await Mediator.Send(new ValidateSessionCommand
+            {
+                UserId = request.UserId,
                 RefreshToken = refreshToken,
             }, cancellationToken);
 
